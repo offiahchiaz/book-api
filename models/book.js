@@ -11,18 +11,12 @@ const BookSchema = new Schema({
         type: String,
         required: true
     },
-    description: {
-        type: String
-    },
     author: {
         type: String,
         required: true
     },
-    publisher: {
-        type: String
-    },
-    pages: {
-        type: String
+    price: {
+        type: Number
     },
     image_url: {
         type: String

@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
+const async = require('async');
 
 const Genre = require('./models/genre');
 const Book = require('./models/book');
@@ -15,6 +16,8 @@ mongoose.connect('mongodb://localhost:27017/bookapi', {useNewUrlParser: true})
 
 
 app.use(bodyParser.json());
+
+// ============= GENRES ============ //
 
 // POST Genres
 app.post('/api/genres', (req, res) => {
@@ -59,6 +62,28 @@ app.get('/api/genre/:id', (req, res) => {
 });
 
 
+// ============= BOOKS ============ //
+
+// POST Books
+app.post('/api/books', (req, res) => {
+
+    let book = new Book({
+        title: req.body.title,
+        genre: req.body.genre, 
+        author: req.body.author, 
+        price: req.body.price,  
+        image_url: req.body.image_url, 
+        buy_url: req.body.buy_url
+    });
+
+    book.save().then((doc) => {
+        res.send(doc);
+    }, (e) => {
+        res.status(400).send(e);
+    });
+});
+
+
 // GET Books
 app.get('/api/books', (req, res) => {
     Book.find({}).then((books) => {
@@ -73,14 +98,14 @@ app.get('/api/book/:id', (req, res) => {
     const bookId = req.params.id;
 
     if (!ObjectID.isValid(bookId)) {
-        return res.status(404).send();
+        return res.status(404).send('Invalid ID');
     }
 
     Book.findOne({
         _id: bookId
     }).then((book) => {
         if (!book) {
-            return res.status(404).send();
+            return res.status(404).send('Book with this ID does not exist');
         }
         res.send({book});
     }).catch((e) => {
