@@ -16,6 +16,21 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
+app.use(express.urlencoded({ extended: true }));
+
+// POST Genres
+app.post('/api/genres', (req, res) => {
+    let genre = new Genre({
+        name: req.body.name
+    });
+
+    genre.save().then((doc) => {
+        res.send(doc);
+    }, (e) => {
+        res.status(400).send(e);
+    });
+});
+
 // GET Genres
 app.get('/api/genres', (req, res) => {
     Genre.find({})
