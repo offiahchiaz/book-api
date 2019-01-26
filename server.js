@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
+
 const Genre = require('./models/genre');
+const Book = require('./models/book');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -20,6 +22,16 @@ app.get('/api/genres', (req, res) => {
             res.json({genres});
         }, (e)=> {
             res.status(400).json(e);
+        });
+});
+
+// GET Books
+app.get('/api/books', (req, res) => {
+    Book.find({})
+        .then((books) => {
+            res.send({books});
+        }, (e) => {
+            res.status(400).send(e);
         });
 });
 
