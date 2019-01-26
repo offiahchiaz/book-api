@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 
 const Genre = require('./models/genre');
@@ -12,11 +13,8 @@ mongoose.connect('mongodb://localhost:27017/bookapi', {useNewUrlParser: true})
     .then(() => console.log('MongoDB Connected...'))
     .catch((err) => console.log(err));
 
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-});
 
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 // POST Genres
 app.post('/api/genres', (req, res) => {
@@ -33,22 +31,41 @@ app.post('/api/genres', (req, res) => {
 
 // GET Genres
 app.get('/api/genres', (req, res) => {
-    Genre.find({})
-        .then((genres) => {
-            res.json({genres});
-        }, (e)=> {
+    Genre.find({}).then((genres) => {
+        res.json({genres});
+    }, (e)=> {
             res.status(400).json(e);
-        });
+    });
 });
+
+// Get Genre
+app.get('/api/genre/:id', (req, res) => {
+    const genreId = req.params.id;
+
+    if (!ObjectID.isValid(genreId)) {
+        return res.status(404).send('Invalid ID');
+    }
+
+    Genre.findOne({
+        _id: genreId
+    }).then((genre) => {
+        if (!genre) {
+            return res.status(404).send('Genre with this ID does not exist');
+        }
+        res.send({genre});
+    }).catch((e) => {
+        res.status(400).send(e);
+    });
+});
+
 
 // GET Books
 app.get('/api/books', (req, res) => {
-    Book.find({})
-        .then((books) => {
-            res.send({books});
-        }, (e) => {
-            res.status(400).send(e);
-        });
+    Book.find({}).then((books) => {
+        res.send({books});
+    }, (e) => {
+        res.status(400).send(e);
+    });
 });
 
 // GET Book
