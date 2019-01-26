@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const {ObjectID} = require('mongodb');
 
 const Genre = require('./models/genre');
 const Book = require('./models/book');
@@ -33,6 +34,26 @@ app.get('/api/books', (req, res) => {
         }, (e) => {
             res.status(400).send(e);
         });
+});
+
+// GET Book
+app.get('/api/book/:id', (req, res) => {
+    const bookId = req.params.id;
+
+    if (!ObjectID.isValid(bookId)) {
+        return res.status(404).send();
+    }
+
+    Book.findOne({
+        _id: bookId
+    }).then((book) => {
+        if (!book) {
+            return res.status(404).send();
+        }
+        res.send({book});
+    }).catch((e) => {
+        res.status(400).send(e);
+    });
 });
 
 app.listen(port, (err) => {
