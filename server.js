@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 const async = require('async');
+const _ = require('lodash');
 
 const Genre = require('./models/genre');
 const Book = require('./models/book');
@@ -42,7 +43,7 @@ app.get('/api/genres', (req, res) => {
 });
 
 // Get Genre
-app.get('/api/genre/:id', (req, res) => {
+app.get('/api/genres/:id', (req, res) => {
     const genreId = req.params.id;
 
     if (!ObjectID.isValid(genreId)) {
@@ -58,6 +59,26 @@ app.get('/api/genre/:id', (req, res) => {
         res.send({genre});
     }).catch((e) => {
         res.status(400).send(e);
+    });
+});
+
+// PATCH Genre
+app.patch('/api/genres/:id', (req, res) => {
+    let genreId = req.params.id;
+    let body = _.pick(req.body, ['name']);
+
+    if (!ObjectID.isValid(genreId)) {
+        return res.status(404).send('Invalid ID');
+    }
+
+    Genre.findOneAndUpdate({_id: genreId}, {$set: body}, {new: true}).then((genre) => {
+        if (!genre) {
+            return res.status(404).send('Genre does not exist');
+        }
+
+        res.send({genre});
+    }).catch((e) => {
+        res.status(400).send();
     });
 });
 
@@ -94,7 +115,7 @@ app.get('/api/books', (req, res) => {
 });
 
 // GET Book
-app.get('/api/book/:id', (req, res) => {
+app.get('/api/books/:id', (req, res) => {
     const bookId = req.params.id;
 
     if (!ObjectID.isValid(bookId)) {
