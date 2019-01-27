@@ -5,24 +5,30 @@ const Schema = mongoose.Schema;
 const BookSchema = new Schema({
     title: {
         type: String,
+        trim: true,
         required: true
     },
     genre: {
         type: String,
+        trim: true,
         required: true
     },
     author: {
         type: String,
+        trim: true,
         required: true
     },
     price: {
-        type: Number
+        type: Number,
+        trim: true,
     },
     image_url: {
-        type: String
+        type: String,
+        trim: true,
     },
     buy_url: {
-        type: String
+        type: String,
+        trim: true,
     },
     created_at: {
         type: Date,

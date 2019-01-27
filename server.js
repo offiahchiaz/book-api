@@ -134,6 +134,26 @@ app.get('/api/books/:id', (req, res) => {
     });
 });
 
+// PATCH BOOK
+app.patch('/api/books/:id', (req, res) => {
+    let bookId = req.params.id;
+    let body = _.pick(req.body, ['title', 'genre', 'author', 'price', 'image_url', 'buy_url']);
+
+    if (!ObjectID.isValid(bookId)) {
+        return res.status(400).send('Invalid ID');
+    }
+
+    Book.findOneAndUpdate({_id: bookId}, {$set: body}, {new: true}).then((book) => {
+        if (!book) {
+            return res.status(404).send('Book with this ID not found');
+        }
+
+        res.send({book});
+    }).catch((e) => {
+        res.status(400).send();
+    });
+});
+
 app.listen(port, (err) => {
     if (err) return console.log(err);
     console.log(`Server running on port ${port}`);
