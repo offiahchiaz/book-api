@@ -82,6 +82,25 @@ app.patch('/api/genres/:id', (req, res) => {
     });
 });
 
+// DELETE Genre
+app.delete('/api/genres/:id', (req, res) => {
+    let genreId = req.params.id;
+
+    if (!ObjectID.isValid(genreId)) {
+        return res.status(404).send('Invalid ID');
+    }
+
+    Genre.findOneAndRemove({_id: genreId}).then((genre) => {
+        if (!genre) {
+            return res.status(404).send('Genre does not exist');
+        }
+
+        res.send({genre});
+    }).catch((e) => {
+        res.status(400).send();
+    });
+});
+
 
 // ============= BOOKS ============ //
 
