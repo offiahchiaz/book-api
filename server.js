@@ -173,6 +173,27 @@ app.patch('/api/books/:id', (req, res) => {
     });
 });
 
+// DELETE Book
+app.delete('/api/books/:id', (req, res) => {
+    let bookId = req.params.id;
+
+    if (!ObjectID.isValid(bookId)) {
+        return res.status(404).send('Invalid ID');
+    }
+
+    Book.findOneAndRemove({_id: bookId}).then((book) => {
+        if (!book) {
+            return res.status(404).send('Book does not exist');
+        }
+
+        res.send({book});
+    }).catch((e) => {
+        res.status(400).send();
+    });
+});
+
+
+
 app.listen(port, (err) => {
     if (err) return console.log(err);
     console.log(`Server running on port ${port}`);
