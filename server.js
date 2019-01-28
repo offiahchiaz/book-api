@@ -5,8 +5,10 @@ const {ObjectID} = require('mongodb');
 const async = require('async');
 const _ = require('lodash');
 
-const Genre = require('./models/genre');
-const Book = require('./models/book');
+// const Genre = require('./models/genre');
+// const Book = require('./models/book');
+
+const genre_controller = require('./controllers/genreController');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -21,85 +23,19 @@ app.use(bodyParser.json());
 // ============= GENRES ============ //
 
 // POST Genres
-app.post('/api/genres', (req, res) => {
-    let genre = new Genre({
-        name: req.body.name
-    });
-
-    genre.save().then((doc) => {
-        res.send(doc);
-    }, (e) => {
-        res.status(400).send(e);
-    });
-});
+app.post('/api/genres', genre_controller.add_genre);
 
 // GET Genres
-app.get('/api/genres', (req, res) => {
-    Genre.find({}).then((genres) => {
-        res.json({genres});
-    }, (e)=> {
-            res.status(400).json(e);
-    });
-});
+app.get('/api/genres', genre_controller.genre_list);
 
 // Get Genre
-app.get('/api/genres/:id', (req, res) => {
-    const genreId = req.params.id;
-
-    if (!ObjectID.isValid(genreId)) {
-        return res.status(404).send('Invalid ID');
-    }
-
-    Genre.findOne({
-        _id: genreId
-    }).then((genre) => {
-        if (!genre) {
-            return res.status(404).send('Genre with this ID does not exist');
-        }
-        res.send({genre});
-    }).catch((e) => {
-        res.status(400).send(e);
-    });
-});
+app.get('/api/genres/:id', genre_controller.genre_detail);
 
 // PATCH Genre
-app.patch('/api/genres/:id', (req, res) => {
-    let genreId = req.params.id;
-    let body = _.pick(req.body, ['name']);
-
-    if (!ObjectID.isValid(genreId)) {
-        return res.status(404).send('Invalid ID');
-    }
-
-    Genre.findOneAndUpdate({_id: genreId}, {$set: body}, {new: true}).then((genre) => {
-        if (!genre) {
-            return res.status(404).send('Genre does not exist');
-        }
-
-        res.send({genre});
-    }).catch((e) => {
-        res.status(400).send();
-    });
-});
+app.patch('/api/genres/:id', genre_controller.update_genre);
 
 // DELETE Genre
-app.delete('/api/genres/:id', (req, res) => {
-    let genreId = req.params.id;
-
-    if (!ObjectID.isValid(genreId)) {
-        return res.status(404).send('Invalid ID');
-    }
-
-    Genre.findOneAndRemove({_id: genreId}).then((genre) => {
-        if (!genre) {
-            return res.status(404).send('Genre does not exist');
-        }
-
-        res.send({genre});
-    }).catch((e) => {
-        res.status(400).send();
-    });
-});
+app.delete('/api/genres/:id', genre_controller.delete_genre);
 
 
 // ============= BOOKS ============ //
